@@ -23,7 +23,7 @@
    </vm>
 
    <plugins>
-      <plugin id="hu.bme.ftsrg.gamma.headless.wrapper"/>
+      <plugin id="hu.bme.mit.gamma.headless.wrapper"/>
       <plugin id="javax.servlet"/>
       <plugin id="javax.xml"/>
       <plugin id="org.eclipse.core.jobs"/>
