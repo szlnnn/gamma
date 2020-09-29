@@ -1,0 +1,8 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Headless Wrapper
+Bundle-SymbolicName: hu.bme.ftsrg.gamma.headless.wrapper;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Automatic-Module-Name: hu.bme.ftsrg.gamma.headless.wrapper
+Bundle-RequiredExecutionEnvironment: JavaSE-11
+Require-Bundle: org.eclipse.equinox.app;bundle-version="1.5.0"
