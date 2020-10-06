@@ -2,7 +2,8 @@
 <?eclipse version="3.4"?>
 <plugin>
    <extension
-         id="id1"
+         id="hu.bme.mit.gamma.wrapper.runtime.application"
+         name="Wrapper Extension"
          point="org.eclipse.core.runtime.applications">
       <application
             cardinality="singleton-global"
@@ -14,15 +15,15 @@
       </application>
    </extension>
    <extension
-         id="gamma.wrapper"
+         id="hu.bme.mit.gamma.wrapper"
          name="Wrapper"
          point="org.eclipse.core.runtime.products">
       <product
-            application="hu.bme.ftsrg.gamma.headless.wrapper.product1"
+            application="hu.bme.mit.gamma.wrapper.runtime.application"
             name="name">
          <property
-               name="hu.bme.ftsrg.gamma.headless.wrapper.property1"
-               value="hu.bme.ftsrg.gamma.headless.wrapper.property1">
+               name="hu.bme.ftsrg.gamma.headless.wrapper.property"
+               value="hu.bme.ftsrg.gamma.headless.wrapper.property">
          </property>
       </product>
    </extension>
