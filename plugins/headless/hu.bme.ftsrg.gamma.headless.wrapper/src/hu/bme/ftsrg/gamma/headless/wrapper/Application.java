@@ -6,8 +6,12 @@ public class Application implements IApplication{
 
 	@Override
 	public Object start(IApplicationContext arg0) throws Exception {
-		System.out.print("Testing");
+		//System.out.print("Testing");
+		//XtextStandaloneSetup.doSetup();
 
+		CodeGenerator cd = new CodeGenerator();
+		
+		Object obj = cd.execute(); 
 		
 		return null;
 		
