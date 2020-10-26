@@ -39,11 +39,10 @@ protected Logger logger = Logger.getLogger("GammaLogger");
 	
 	protected final String folderName = "src-gen";
 	
-	public Object execute() throws CoreException {
-			String filePath = "/model/Crossroad.gcd";
+	public Object execute(String filePath,String projectName) throws CoreException {
 			IPath path = new Path(filePath);
 		 IProject p =
-		    		 ResourcesPlugin.getWorkspace().getRoot().getProject("hu.bme.mit.gamma.tutorial.finish");
+		    		 ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
 		    IFile file = (IFile)p.findMember(filePath);
 			Injector injector = new StatechartLanguageStandaloneSetupGenerated().createInjectorAndDoEMFRegistration();
 			XtextResourceSet resSet = injector.getInstance(XtextResourceSet.class);
