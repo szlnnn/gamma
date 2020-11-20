@@ -1,0 +1,53 @@
+/********************************************************************************
+ * Copyright (c) 2019 Contributors to the Gamma project
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * SPDX-License-Identifier: EPL-1.0
+ ********************************************************************************/
+package hu.bme.mit.gamma.api.taskhandler;
+
+import static com.google.common.base.Preconditions.checkArgument;
+
+import java.io.IOException;
+import java.util.AbstractMap.SimpleEntry;
+
+import org.eclipse.core.resources.IFile;
+
+import hu.bme.mit.gamma.statechart.interface_.Package;
+import hu.bme.mit.gamma.api.taskhandler.YakinduCompilationHandler;
+import hu.bme.mit.gamma.genmodel.model.StatechartCompilation;
+import hu.bme.mit.gamma.yakindu.transformation.batch.ModelValidator;
+import hu.bme.mit.gamma.yakindu.transformation.batch.YakinduToGammaTransformer;
+import hu.bme.mit.gamma.yakindu.transformation.traceability.Y2GTrace;
+
+public class StatechartCompilationHandler extends YakinduCompilationHandler {
+
+	public StatechartCompilationHandler(IFile file) {
+		super(file);
+	}
+	
+	public void execute(StatechartCompilation statechartCompilation) throws IOException {
+		setYakinduCompilation(statechartCompilation);
+		setStatechartCompilation(statechartCompilation, statechartCompilation.getStatechart().getName());
+		ModelValidator validator = new ModelValidator(statechartCompilation.getStatechart());
+		validator.checkModel();
+		YakinduToGammaTransformer transformer = new YakinduToGammaTransformer(statechartCompilation);
+		SimpleEntry<Package, Y2GTrace> resultModels = transformer.execute();
+		// Saving Xtext and EMF models
+		saveModel(resultModels.getKey(), targetFolderUri, statechartCompilation.getFileName().get(0) + ".gcd");
+		saveModel(resultModels.getValue(), targetFolderUri, "." + statechartCompilation.getFileName().get(0) + ".y2g");
+		transformer.dispose();
+	}
+
+	private void setStatechartCompilation(StatechartCompilation statechartCompilation, String statechartName) {
+		checkArgument(statechartCompilation.getStatechartName().size() <= 1);
+		if (statechartCompilation.getStatechartName().isEmpty()) {
+			statechartCompilation.getStatechartName().add(statechartName);
+		}
+	}
+
+}
