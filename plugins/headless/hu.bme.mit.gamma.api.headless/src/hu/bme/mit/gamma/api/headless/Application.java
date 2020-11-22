@@ -2,6 +2,7 @@ package hu.bme.mit.gamma.api.headless;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Map;
 import org.eclipse.core.resources.IContainer;
@@ -27,8 +28,16 @@ import hu.bme.mit.gamma.genmodel.language.GenModelStandaloneSetup;
 import hu.bme.mit.gamma.property.language.PropertyLanguageStandaloneSetup;
 import hu.bme.mit.gamma.statechart.language.StatechartLanguageStandaloneSetup;
 import hu.bme.mit.gamma.trace.language.TraceLanguageStandaloneSetup;
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import org.apache.commons.io.FileUtils;
 
 public class Application implements IApplication {
+	
+	private static final String UNDER_OPERATION_PROPERTY = "underOperation";
+	
     @Override
     public Object start(final IApplicationContext context) throws Exception {
         ExpressionLanguageStandaloneSetup.doSetup();
@@ -39,9 +48,10 @@ public class Application implements IApplication {
     	GenModelStandaloneSetup.doSetup();
         final Map<?, ?> args = context.getArguments();
         final String[] appArgs = (String[]) args.get(IApplicationContext.APPLICATION_ARGS);
-        if (appArgs.length == 1) {
+        if (appArgs.length >= 1) {
             String ggenFilePath = URI.decode(appArgs[0]);
             File ggenFile = new File(ggenFilePath);
+            String projectDescriptorPath = URI.decode(appArgs[1]);
             File projectFolder = getContainingProject(ggenFile);
             String projectName = projectFolder.getName();
             String fileWorkspaceRelativePath = ggenFilePath.substring(projectFolder.getParent().length());
@@ -81,7 +91,10 @@ public class Application implements IApplication {
             gammaApi.run(fileWorkspaceRelativePath);
             // Saving the workspace, otherwise warnings will be printed
             workspace.save(true, progressMonitor);
+            
+            beforeExitOperation(projectDescriptorPath);
         }
+    	
         return IApplication.EXIT_OK;
     }
     
@@ -129,6 +142,32 @@ public class Application implements IApplication {
     
     @Override
     public void stop() {
-        // Nothing special to do
+    
+    }
+    
+    private void beforeExitOperation(String projectDescriptorPath) {
+    	File descriptor = new File(projectDescriptorPath);
+    	if (descriptor != null) {
+    		try {
+    			System.out.println("ENDING");
+				updateUnderOperationStatus(descriptor.getPath());
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+    	}
+    }
+    
+	private void updateUnderOperationStatus(String projectDescriptorPath) throws IOException {
+        File jsonFile = new File(projectDescriptorPath);
+        String jsonString = FileUtils.readFileToString(jsonFile);
+        JsonElement jElement = new JsonParser().parse(jsonString);
+        JsonObject jObject = jElement.getAsJsonObject();
+        jObject.remove(UNDER_OPERATION_PROPERTY);
+        jObject.addProperty(UNDER_OPERATION_PROPERTY , false);
+
+        Gson gson = new Gson();
+        String resultingJson = gson.toJson(jElement);
+        FileUtils.writeStringToFile(jsonFile, resultingJson);
+
     }
 }
